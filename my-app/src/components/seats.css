@@ -1,0 +1,17 @@
+
+.seat {
+    border: solid 1px black;
+    box-sizing: border-box;
+}
+
+.seat.reserved {
+    background-color: #404040;
+}
+
+.seat.chosen {
+    background-color: green;
+}
+
+.all_seats {
+    position: relative;
+}

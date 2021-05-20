@@ -1,0 +1,19 @@
+.site-layout-content {
+  min-height: 280px;
+  padding: 24px;
+  background: #fff;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.ant-layout-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.layout {
+  height: 100%;
+}
