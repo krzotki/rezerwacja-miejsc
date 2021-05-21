@@ -83,7 +83,8 @@ const Seats = (props) => {
             let available = true;
 
             if (seatsChosen.length > 0) {
-                available = ((!nextToEachOther) || (nextToEachOther && !unavailableSeats.includes(seatId)));
+                const firstChosen = seats.find(seat => seat.id === seatsChosen[0]);
+                available = ((!nextToEachOther) || (nextToEachOther && !unavailableSeats.includes(seatId) &&  (nextToEachOther && firstChosen.cords.x === seat.cords.x)));
             }
 
             if (seatsChosen.length < seatCount && !seat.reserved && available) {
@@ -123,12 +124,13 @@ const Seats = (props) => {
 
         let chosenSeats = seatsChosen.map(id => seats.find(seat => seat.id === id));
 
+
         chosenSeats = chosenSeats.slice().sort((s1, s2) => {
             return s1.cords.y - s2.cords.y;
         });
 
         for (let i = 1; i < chosenSeats.length; i++) {
-            if (chosenSeats[i].cords.y - chosenSeats[i - 1].cords.y > 1) {
+            if (chosenSeats[i].cords.y - chosenSeats[i - 1].cords.y > 1 || chosenSeats[i].cords.x !== chosenSeats[0].cords.x) {
                 return false;
             }
         }
