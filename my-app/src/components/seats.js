@@ -1,7 +1,39 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { seatsActions } from "../store/index";
+import { Button } from "antd";
+import Seat from '../components/seat';
+import Aux from '../components/myAux';
 import './seats.css';
+import { Link } from "react-router-dom";
+
+const getUnavailableSeats = (seatCount, seats, minX, maxX, minY, maxY, chosenSeatsIds) => {
+    const unavailableSeats = [];
+    let seatsCombo = [];
+
+    for (let i = minX; i <= maxX; i++) {
+        for (let j = minY; j <= maxY; j++) {
+            const seat = seats.find(seat => seat.cords.x === i && seat.cords.y === j);
+
+            if ((!seat || seat.reserved)) {
+                if (seatsCombo.length < seatCount) {
+                    unavailableSeats.push(...seatsCombo);
+                }
+                seatsCombo = [];
+            }
+            else {
+                seatsCombo.push(seat.id);
+            }
+        }
+
+        if (seatsCombo.length < seatCount) {
+            unavailableSeats.push(...seatsCombo);
+        }
+        seatsCombo = [];
+    }
+
+    return unavailableSeats;
+};
 
 const Seats = (props) => {
 
@@ -37,45 +69,97 @@ const Seats = (props) => {
     const seatSize = 60;
 
     const seatClickHandler = (seatId) => {
-        const index = seatsChosen.findIndex(seat => seat == seatId);
-        if(index > -1) {
+
+        const seat = seats.find(seat => seat.id === seatId);
+        const index = seatsChosen.findIndex(seat => seat === seatId);
+        if (index > -1) {
             const newSeats = [...seatsChosen];
             newSeats.splice(index, 1);
             dispatch(seatsActions.updateChosenSeats(newSeats));
         }
         else {
-            dispatch(seatsActions.updateChosenSeats(seatsChosen.concat(seatId)));
+
+            let sameRow = true;
+
+            if (seatsChosen.length > 0) {
+                const firstChosen = seats.find(seat => seat.id === seatsChosen[0]);
+                sameRow = ((!nextToEachOther) || (nextToEachOther && firstChosen.cords.x === seat.cords.x));
+            }
+
+            if (seatsChosen.length < seatCount && !seat.reserved && !unavailableSeats.includes(seatId) && sameRow) {
+                dispatch(seatsActions.updateChosenSeats(seatsChosen.concat(seatId)));
+            }
         }
     };
 
-    const seatsElements = seats.map(seat => {
-        const styles = {
-            position: 'absolute',
-            left: `${seat.cords.y * seatSize}px`,
-            top: `${seat.cords.x * seatSize}px`,
-            width: `${seatSize - 10}px`,
-            height: `${seatSize - 10}px`,
-            margin: '10px'
-        };
+    const unavailableSeats = getUnavailableSeats(seatCount, seats, minX, maxX, minY, maxY, seatsChosen);
 
-        const classes = ['seat'];
-        if(seat.reserved) classes.push('reserved');
-        if(seatsChosen.includes(seat.id)) classes.push('chosen');
-
-        return <div onClick={() => seatClickHandler(seat.id)} className={classes.join(' ')} style={styles} key={seat.id}>{seat.id}</div>;
-    });
-
-    console.log(seatsChosen)
+    const seatsElements = seats.map(seat =>
+        <Seat
+            key={seat.id}
+            seat={seat}
+            seatSize={seatSize}
+            seatClickHandler={(seatId) => seatClickHandler(seatId)}
+            seatChosen={seatsChosen.includes(seat.id)}
+            seatUnavailable={unavailableSeats.includes(seat.id)}
+        ></Seat>
+    );
 
     const containerStyles = {
         width: `${(maxY - minY + 1) * seatSize}px`,
         height: `${(maxX - minX + 1) * seatSize}px`,
     };
 
+    const finalCheck = () => {
+
+        if (seatsChosen.length != seatCount) {
+            return false;
+        }
+
+        if (!nextToEachOther) {
+            return true;
+        }
+
+        let chosenSeats = seatsChosen.map(id => seats.find(seat => seat.id === id));
+
+        chosenSeats = chosenSeats.slice().sort((s1, s2) => {
+            return s1.cords.y - s2.cords.y;
+        });
+
+        for (let i = 1; i < chosenSeats.length; i++) {
+            if (chosenSeats[i].cords.y - chosenSeats[i - 1].cords.y > 1) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     return (
-        <div className='all_seats' style={containerStyles}>
-            {seatsElements}
-        </div>
+        <Aux>
+            <h3>Wybierz {seatCount} miejsc {nextToEachOther && "obok siebie"}</h3>
+            <p>Pozostało jeszcze {seatCount - seatsChosen.length}</p>
+
+            <div className='all_seats' style={containerStyles}>
+                {seatsElements}
+            </div>
+
+            <div className='footer'>
+                <div className='seat_legend'> Miejsce dostępne </div>
+                <div className='seat_legend reserved'> Miejsce zajęte </div>
+                <div className='seat_legend chosen'> Miejsce wybrane przez Ciebie </div>
+                <div className='seat_legend unavailable'> Brak miejsca dla {seatCount} osób </div>
+
+                <Link to='/summary'>
+                    <Button
+                        disabled={!finalCheck()}
+                    >
+                        Zatwierdź
+                    </Button>
+                </Link>
+
+            </div>
+        </Aux>
     );
 };
 

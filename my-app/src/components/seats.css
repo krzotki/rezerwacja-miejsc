@@ -2,16 +2,56 @@
 .seat {
     border: solid 1px black;
     box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
 }
 
-.seat.reserved {
+.seat:hover {
+    box-shadow: 0px 1px 3px black;
+}
+
+.seat.reserved, 
+.seat_legend.reserved:before {
     background-color: #404040;
+    cursor: initial;
+    box-shadow: none;
 }
 
-.seat.chosen {
+.seat.chosen,
+.seat_legend.chosen::before {
     background-color: green;
+}
+
+.seat.unavailable,
+.seat_legend.unavailable::before {
+    background-color: rgb(202, 78, 78);
+    cursor: initial;
+    box-shadow: none;
+}
+
+.seat.next_to_selected {
+    box-shadow: inset 0px 0px 4px green;
 }
 
 .all_seats {
     position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: auto;
+}
+
+.seat_legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.seat_legend:before {
+    margin: 0 10px;
+    display: inline-block;
+    content: '';
+    width: 50px;
+    height: 50px;
+    border: solid 1px black;
 }

@@ -1,5 +1,5 @@
 import {  Input, Checkbox, Button } from "antd";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {seatsActions } from '../store/index';
 
@@ -24,9 +24,9 @@ const Setup = () => {
             <Input value={seatCount} type='number' addonBefore='Liczba miejsc' onChange={(evt) => handleInputChange(evt)}></Input>
 
             <Checkbox checked={checked} onChange={(evt) => handleCheckboxChange(evt)}>Czy miejsca mają być obok siebie?</Checkbox>
-            <NavLink to='/seats' exact>
+            <Link to='/seats'>
                  <Button >Wybierz miejsca</Button>
-            </NavLink>
+            </Link>
         </div>
     );
 };

@@ -16,13 +16,11 @@ function App() {
   return (
     <BrowserRouter>
       <Layout className='layout'>
-        <Header></Header>
         <Content>
           <Route path='/' exact component={Setup} />
           <Route path='/seats' exact component={Seats} />
           <Route path='/summary' exact component={Summary} />
         </Content>
-        <Footer></Footer>
       </Layout>
     </BrowserRouter>
 
