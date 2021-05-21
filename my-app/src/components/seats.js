@@ -72,6 +72,7 @@ const Seats = (props) => {
 
         const seat = seats.find(seat => seat.id === seatId);
         const index = seatsChosen.findIndex(seat => seat === seatId);
+
         if (index > -1) {
             const newSeats = [...seatsChosen];
             newSeats.splice(index, 1);
@@ -79,15 +80,15 @@ const Seats = (props) => {
         }
         else {
 
-            let sameRow = true;
+            let available = true;
 
             if (seatsChosen.length > 0) {
-                const firstChosen = seats.find(seat => seat.id === seatsChosen[0]);
-                sameRow = ((!nextToEachOther) || (nextToEachOther && firstChosen.cords.x === seat.cords.x));
+                available = ((!nextToEachOther) || (nextToEachOther && !unavailableSeats.includes(seatId)));
             }
 
-            if (seatsChosen.length < seatCount && !seat.reserved && !unavailableSeats.includes(seatId) && sameRow) {
+            if (seatsChosen.length < seatCount && !seat.reserved && available) {
                 dispatch(seatsActions.updateChosenSeats(seatsChosen.concat(seatId)));
+                console.log(seat)
             }
         }
     };
