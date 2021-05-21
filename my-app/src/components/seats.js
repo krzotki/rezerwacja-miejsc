@@ -101,7 +101,7 @@ const Seats = (props) => {
             seatSize={seatSize}
             seatClickHandler={(seatId) => seatClickHandler(seatId)}
             seatChosen={seatsChosen.includes(seat.id)}
-            seatUnavailable={unavailableSeats.includes(seat.id)}
+            seatUnavailable={unavailableSeats.includes(seat.id) && nextToEachOther}
         ></Seat>
     );
 
